@@ -2226,6 +2226,7 @@ sub gen_curl_cmd_from_req ($$) {
         push @args, '-0';
     }
 
+
     my @headers;
     if ($http_ver ge '1.0') {
         if ($req =~ m{\G(.*?)\r?\n\r?\n}gcs) {
@@ -2283,10 +2284,20 @@ sub gen_curl_cmd_from_req ($$) {
         $server_addr = $ServerAddr;
     }
 
+    my $curl_protocol = $block->curl_protocol;
+    if (!defined $curl_protocol) {
+        $curl_protocol = "http";
+    }
+
     {
         my $server = $server_addr;
         my $port = $ServerPortForClient;
-        $link = "http://$server:$port$uri";
+        $link = "$curl_protocol://$server:$port$uri";
+    }
+
+    my $curl_options = $block->curl_options;
+    if (defined $curl_options) {
+        push @args, $curl_options;
     }
 
     push @args, $link;
